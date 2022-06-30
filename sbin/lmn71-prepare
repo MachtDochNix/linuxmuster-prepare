@@ -51,8 +51,8 @@ user_list = ['linuxmuster', 'linuxadmin', 'lmn', 'lmnadmin']
 profile = ''
 pvdevice = ''
 vgname = 'vg_srv'
-lvmvols = [('var', '10G', '/var'), ('linbo', '40G', '/srv/linbo'), ('global', '10G',
-                                                                    '/srv/samba/global'), ('default-school', '100%FREE', '/srv/samba/schools/default-school')]
+lvm_sizes = ['10G', '40G', '10G', '100%FREE']
+lvmvols = [('var', lvm_sizes[0], '/var'), ('linbo', lvm_sizes[1], '/srv/linbo'), ('global', lvm_sizes[2], '/srv/samba/global'), ('default-school', lvm_sizes[3], '/srv/samba/schools/default-school')]
 quotamntopts = 'user_xattr,acl,usrjquota=aquota.user,grpjquota=aquota.group,jqfmt=vfsv0,barrier=1'
 unattended = False
 # ipset = False
@@ -417,6 +417,24 @@ def do_network(iface, iface_default, ipnr, ipnet, hostip, bitmask, netmask, broa
                 print("Invalid entry!")
     return iface, hostname, domainname, hostip, bitmask, netmask, network, broadcast, firewallip, gateway
 
+# Query the preferred volume sizes of the LVM partitions
+def do_lvmr4user(lvmvols):
+    i = 0
+    for item in lvmvols:
+        user_input = ''
+        while user_input == '':
+            user_input = input('What size for '+item[2]+' do you prefer ['+item[1]+']: ')
+            if user_input == '':
+                user_input = item[1]
+            if item[0] == 'default-school' and re.match('[1-9][0-9]*[GT]|100%FREE', user_input):
+                continue
+            if  re.match('[1-9][0-9]*[GT]', user_input):
+                continue
+            else:
+                print('Incorrect input!\nVolume size in [G]Byte or [T]Byte or\nfor default-school also [100%FREE] for the remaining available disk space!')
+                user_input = ''
+        lvm_sizes[i] = user_input
+        i += 1 
 
 # lvm
 def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
@@ -827,6 +845,9 @@ if initial:
     iface, hostname, domainname, hostip, bitmask, netmask, network, broadcast, firewallip, gateway = do_network(
         iface, iface_default, ipnr, ipnet, hostip, bitmask, netmask, broadcast, firewallip, gateway, hostname, domainname, unattended, setup_mode)
     if profile == 'server':
+        if initial == True and unattended == False and force == False:
+            do_lvmr4user(lvmvols)
+            lvmvols = [('var', lvm_sizes[0], '/var'), ('linbo', lvm_sizes[1], '/srv/linbo'), ('global', lvm_sizes[2], '/srv/samba/global'), ('default-school', lvm_sizes[3], '/srv/samba/schools/default-school')]
         pvdevice = do_lvm(pvdevice, vgname, lvmvols, quotamntopts)
         if pvdevice == '':
             do_fstab_root(quotamntopts)
