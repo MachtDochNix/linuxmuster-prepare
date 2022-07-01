@@ -436,7 +436,7 @@ def do_users_lvmsizes(lvmvols, lvm_sizes):
                 user_input = ''
         lvm_sizes[i] = user_input
         i += 1 
-    return("[('var', '" + lvm_sizes[0] + "', '/var'), ('linbo', '" + lvm_sizes[1] + "', '/srv/linbo'), ('global', '" + lvm_sizes[2] + "', '/srv/samba/global'), ('default-school', '" + lvm_sizes[3] + "', '/srv/samba/schools/default-school')]"    
+    return tuple("[('var', '" + lvm_sizes[0] + "', '/var'), ('linbo', '" + lvm_sizes[1] + "', '/srv/linbo'), ('global', '" + lvm_sizes[2] + "', '/srv/samba/global'), ('default-school', '" + lvm_sizes[3] + "', '/srv/samba/schools/default-school')]")    
 
 # lvm
 def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
