@@ -418,7 +418,7 @@ def do_network(iface, iface_default, ipnr, ipnet, hostip, bitmask, netmask, broa
     return iface, hostname, domainname, hostip, bitmask, netmask, network, broadcast, firewallip, gateway
 
 # Query the preferred volume sizes of the LVM partitions
-def do_lvmr4user(lvmvols):
+def do_users_lvmsizes(lvmvols):
     i = 0
     for item in lvmvols:
         user_input = ''
@@ -435,6 +435,7 @@ def do_lvmr4user(lvmvols):
                 user_input = ''
         lvm_sizes[i] = user_input
         i += 1 
+    return("[('var, '" + lvm_sizes[0] + "', /var'), ('linbo', " + lvm_sizes[1] + ", '/srv/linbo'), ('global', " + lvm_sizes[2] + ", '/srv/samba/global'), ('default-school', " + lvm_sizes[3] + ", '/srv/samba/schools/default-school')]")
 
 # lvm
 def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
@@ -846,8 +847,7 @@ if initial:
         iface, iface_default, ipnr, ipnet, hostip, bitmask, netmask, broadcast, firewallip, gateway, hostname, domainname, unattended, setup_mode)
     if profile == 'server':
         if initial == True and unattended == False and force == False:
-            do_lvmr4user(lvmvols)
-            lvmvols = [('var', lvm_sizes[0], '/var'), ('linbo', lvm_sizes[1], '/srv/linbo'), ('global', lvm_sizes[2], '/srv/samba/global'), ('default-school', lvm_sizes[3], '/srv/samba/schools/default-school')]
+            lvmvols = do_users_lvmsizes(lvmvols)
         pvdevice = do_lvm(pvdevice, vgname, lvmvols, quotamntopts)
         if pvdevice == '':
             do_fstab_root(quotamntopts)
