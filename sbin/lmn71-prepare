@@ -445,10 +445,10 @@ def do_users_lvmsizes(lvm_partion_names, lvm_sizes, lvm_paths):
         print(lvm_sizes)
         user_input = ''
         while user_input == '':
-            user_input = input('What size for '+item[i]+' do you prefer ['+item[i]+']: ')
+            user_input = input('What size for '+lvm_partion_names[i]+' do you prefer ['+lvm_sizes[i]+']: ')
             if user_input == '':
-                user_input = item[1]
-            if item[i] == 'default-school' and re.match('[1-9][0-9]*[GT]|100%FREE', user_input):
+                user_input = lvm_sizes[1]
+            if lvm_partion_names[i] == 'default-school' and re.match('[1-9][0-9]*[GT]|100%FREE', user_input):
                 continue
             if  re.match('[1-9][0-9]*[GT]', user_input):
                 continue
