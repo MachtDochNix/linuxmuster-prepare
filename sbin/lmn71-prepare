@@ -53,8 +53,7 @@ pvdevice = ''
 vgname = 'vg_srv'
 lvm_partion_names = ['var', 'linbo', 'global', 'default-school'] 
 lvm_sizes = ['10G', '40G', '10G', '100%FREE']
-lvm_paths = ['/var', '/srv/linbo','/srv/samba/global', '/srv/samba/schools/default-school')
-lvmvols = convert(lvm_partion_names , lvm_sizes , lvm_paths )# = [('var', lvm_sizes[0], '/var'), ('linbo', lvm_sizes[1], '/srv/linbo'), ('global', lvm_sizes[2], '/srv/samba/global'), ('default-school', lvm_sizes[3], '/srv/samba/schools/default-school')]
+lvm_paths = ['/var', '/srv/linbo','/srv/samba/global', '/srv/samba/schools/default-school']
 quotamntopts = 'user_xattr,acl,usrjquota=aquota.user,grpjquota=aquota.group,jqfmt=vfsv0,barrier=1'
 unattended = False
 # ipset = False
@@ -420,10 +419,10 @@ def do_network(iface, iface_default, ipnr, ipnet, hostip, bitmask, netmask, broa
     return iface, hostname, domainname, hostip, bitmask, netmask, network, broadcast, firewallip, gateway
 
 # Query the preferred volume sizes of the LVM partitions
-def do_users_lvmsizes(lvmvols, lvm_sizes):
+def do_users_lvmsizes(lvm_sizes)
     i = 0
-    for item in lvmvols:
-        print(lvmvols)
+    for item in lvm_sizes:
+        print(lvm_sizes)
         user_input = ''
         while user_input == '':
             user_input = input('What size for '+item[2]+' do you prefer ['+item[1]+']: ')
@@ -438,7 +437,6 @@ def do_users_lvmsizes(lvmvols, lvm_sizes):
                 user_input = ''
         lvm_sizes[i] = user_input
         i += 1 
-    return tuple("[('var', '" + lvm_sizes[0] + "', '/var'), ('linbo', '" + lvm_sizes[1] + "', '/srv/linbo'), ('global', '" + lvm_sizes[2] + "', '/srv/samba/global'), ('default-school', '" + lvm_sizes[3] + "', '/srv/samba/schools/default-school')]")    
 
 # lvm
 def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
@@ -850,8 +848,8 @@ if initial:
         iface, iface_default, ipnr, ipnet, hostip, bitmask, netmask, broadcast, firewallip, gateway, hostname, domainname, unattended, setup_mode)
     if profile == 'server':
         if initial == True and unattended == False and force == False:
-            lvmvols = do_users_lvmsizes(lvmvols, lvm_sizes)
-        pvdevice = do_lvm(pvdevice, vgname, lvmvols, quotamntopts)
+            do_users_lvmsizes(lvm_sizes)
+        pvdevice = do_lvm(pvdevice, vgname, convert(lvm_partion_names , lvm_sizes , lvm_paths), quotamntopts)
         if pvdevice == '':
             do_fstab_root(quotamntopts)
         do_quota()
