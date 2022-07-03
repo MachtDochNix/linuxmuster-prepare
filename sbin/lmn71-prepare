@@ -51,8 +51,10 @@ user_list = ['linuxmuster', 'linuxadmin', 'lmn', 'lmnadmin']
 profile = ''
 pvdevice = ''
 vgname = 'vg_srv'
+lvm_partion_names = ['var', 'linbo', 'global', 'default-school'] 
 lvm_sizes = ['10G', '40G', '10G', '100%FREE']
-lvmvols = [('var', lvm_sizes[0], '/var'), ('linbo', lvm_sizes[1], '/srv/linbo'), ('global', lvm_sizes[2], '/srv/samba/global'), ('default-school', lvm_sizes[3], '/srv/samba/schools/default-school')]
+lvm_paths = ['/var', '/srv/linbo','/srv/samba/global', '/srv/samba/schools/default-school')
+lvmvols = convert(lvm_partion_names , lvm_sizes , lvm_paths )# = [('var', lvm_sizes[0], '/var'), ('linbo', lvm_sizes[1], '/srv/linbo'), ('global', lvm_sizes[2], '/srv/samba/global'), ('default-school', lvm_sizes[3], '/srv/samba/schools/default-school')]
 quotamntopts = 'user_xattr,acl,usrjquota=aquota.user,grpjquota=aquota.group,jqfmt=vfsv0,barrier=1'
 unattended = False
 # ipset = False
