@@ -869,7 +869,7 @@ if initial:
     if profile == 'server':
         if initial == True and unattended == False and force == False:
             do_users_lvmsizes(lvm_partion_names, lvm_sizes, lvm_paths)
-        pvdevice = do_lvm(pvdevice, vgname, do_convert(lvm_partion_names , lvm_sizes , lvm_paths), quotamntopts)
+        pvdevice = do_lvm(pvdevice, vgname, convert(lvm_partion_names, lvm_sizes, lvm_paths), quotamntopts)
         if pvdevice == '':
             do_fstab_root(quotamntopts)
         do_quota()
