@@ -418,6 +418,26 @@ def do_network(iface, iface_default, ipnr, ipnet, hostip, bitmask, netmask, broa
                 print("Invalid entry!")
     return iface, hostname, domainname, hostip, bitmask, netmask, network, broadcast, firewallip, gateway
 
+def convert(*args):
+    """
+    Returns a list of tuples generated from multiple lists and tuples
+    """
+    for x in args:
+        if not isinstance(x, list) and not isinstance(x, tuple):
+            return []
+
+    size = float("inf")
+    
+    for x in args:
+        size = min(size, len(x))
+        
+    result = []
+    
+    for i in range(size):
+        result.append(tuple([x[i] for x in args]))
+        
+    return result
+
 # Query the preferred volume sizes of the LVM partitions
 def do_users_lvmsizes(lvm_sizes)
     i = 0
@@ -849,7 +869,7 @@ if initial:
     if profile == 'server':
         if initial == True and unattended == False and force == False:
             do_users_lvmsizes(lvm_sizes)
-        pvdevice = do_lvm(pvdevice, vgname, convert(lvm_partion_names , lvm_sizes , lvm_paths), quotamntopts)
+        pvdevice = do_lvm(pvdevice, vgname, do_convert(lvm_partion_names , lvm_sizes , lvm_paths), quotamntopts)
         if pvdevice == '':
             do_fstab_root(quotamntopts)
         do_quota()
