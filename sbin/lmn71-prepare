@@ -528,24 +528,23 @@ def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
     return pvdevice
 
 
-# set quota mount options to fstab if no lvm is defined
+# set quota mount options to fstab if isn't defined
 def do_fstab_root(quotamntopts):
-    mntopts = quotamntopts + ',errors=remount-ro'
-    config = FSTabConfig(path='/etc/fstab')
-    config.load()
-    count = 0
-    count_max = len(config.tree.filesystems)
-    while count < count_max:
-        mp = config.tree.filesystems[count].mountpoint
-        #print('## Mountpoint ' + str(count) + ' ' + mp)
-        if mp == '/':
-            print('# Modifying mount options for "' + mp + '".')
-            config.tree.filesystems[count].options = mntopts
-            config.save()
-            subprocess.call('mount -o remount /', shell=True)
-            break
-        count += 1
-
+    if sum([1 for i in open('/etc/fstab','r').readlines() if re.search(quotamntopts,i)])) < 2:
+        mntopts = quotamntopts + ',errors=remount-ro'
+        config = FSTabConfig(path='/etc/fstab')
+        config.load()
+        count = 0
+        count_max = len(config.tree.filesystems)
+        while count < count_max:
+            mp = config.tree.filesystems[count].mountpoint
+            #print('## Mountpoint ' + str(count) + ' ' + mp)
+            if mp == '/':
+                print('# Modifying mount options for "' + mp + '".')
+                config.tree.filesystems[count].options = mntopts
+                config.save()
+                subprocess.call('mount -o remount /', shell=True)
+                break
 
 # activate quota on server partitions
 def do_quota():
@@ -870,8 +869,8 @@ if initial:
         if initial == True and unattended == False and force == False:
             do_users_lvmsizes(lvm_partion_names, lvm_sizes, lvm_paths)
         pvdevice = do_lvm(pvdevice, vgname, convert(lvm_partion_names, lvm_sizes, lvm_paths), quotamntopts)
-        if pvdevice == '':
-            do_fstab_root(quotamntopts)
+        # check whether required quota mount options are present and if not, add them
+        do_fstab_root(quotamntopts)
         do_quota()
     updates = do_updates(pkgs)
     # activate serial console
