@@ -442,7 +442,6 @@ def convert(*args):
 def do_users_lvmsizes(lvm_partion_names, lvm_sizes, lvm_paths):
     i = 0
     for item in lvm_sizes:
-        print(lvm_sizes)
         user_input = ''
         while user_input == '':
             user_input = input('What size for '+lvm_partion_names[i]+' do you prefer ['+lvm_sizes[i]+']: ')
