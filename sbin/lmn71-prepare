@@ -544,6 +544,7 @@ def do_fstab_root(quotamntopts):
                 config.save()
                 subprocess.call('mount -o remount /', shell=True)
                 break
+            count +=1
 
 # activate quota on server partitions
 def do_quota():
