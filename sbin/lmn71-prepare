@@ -502,19 +502,13 @@ def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
         subprocess.call('mkdir -p ' + volmnt, shell=True)
         volpath = '/dev/' + vgname + '/' + volname
         print('# Creating logical volume ' + volname + '.')
-        try:
-            lvcreate = 'lvcreate' + volsize + ' -n ' + volname + ' ' + vgname
-            print('# ' + lvcreate)
-            if subprocess.call(lvcreate, shell=True) != 0:
-                sys.exit(1)
-            if subprocess.call('mkfs.ext4 -L ' + volname + ' ' + volpath, shell=True) != 0:
-                sys.exit(1)
-        except:
-            pass
-        finally:
-            print('FEHLERBESCHREIBUNG')
-            if subprocess.call('vgremove ' + vgname + ' -y', shell=True) != 0:
-                sys.exit(1)
+        lvcreate = 'lvcreate' + volsize + ' -n ' + volname + ' ' + vgname
+        print('# ' + lvcreate)
+        if subprocess.call(lvcreate, shell=True) != 0:
+            print('FEHLERSTELLE')
+            sys.exit(1)
+        if subprocess.call('mkfs.ext4 -L ' + volname + ' ' + volpath, shell=True) != 0:
+            sys.exit(1)
         # set quota mount options
         if volname == 'global' or volname == 'default-school':
             mntopts = quotamntopts
