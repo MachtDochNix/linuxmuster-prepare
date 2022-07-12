@@ -504,15 +504,7 @@ def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
         print('# Creating logical volume ' + volname + '.')
         lvcreate = 'lvcreate' + volsize + ' -n ' + volname + ' ' + vgname
         print('# ' + lvcreate)
-        try:
-            if subprocess.call(lvcreate, shell=True) != 0:
-                sys.exit(1)
-        except:
-            pass
-        finally:
-            print('The size entered for ' + lvcreate + '\nexceeds the maximum space in the total\nfor all volumes.\nCheck your entries and use >>100%FREE<< for default-school and try again\n.')
-            subprocess.call('lvremove -y *', shell=True)
-            subprocess.call('vgremove -y ' + vgname, shell=True)
+        if subprocess.call(lvcreate, shell=True) != 0:
             sys.exit(1)
         if subprocess.call('mkfs.ext4 -L ' + volname + ' ' + volpath, shell=True) != 0:
             sys.exit(1)
