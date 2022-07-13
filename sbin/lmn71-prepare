@@ -491,29 +491,39 @@ def do_lvm(pvdevice, vgname, lvmvols, quotamntopts):
     print('# Creating volume group ' + vgname + '.')
     if subprocess.call('vgcreate ' + vgname + ' ' + pvdevice, shell=True) != 0:
         sys.exit(1)
-    for item in lvmvols:
-        volname = item[0]
-        volsize = item[1]
-        if '%' in volsize:
-            volsize = ' -l ' + volsize
-        else:
-            volsize = ' -L ' + volsize
-        volmnt = item[2]
-        subprocess.call('mkdir -p ' + volmnt, shell=True)
-        volpath = '/dev/' + vgname + '/' + volname
-        print('# Creating logical volume ' + volname + '.')
-        lvcreate = 'lvcreate' + volsize + ' -n ' + volname + ' ' + vgname
-        print('# ' + lvcreate)
-        if subprocess.call(lvcreate, shell=True) != 0:
-            sys.exit(1)
-        if subprocess.call('mkfs.ext4 -L ' + volname + ' ' + volpath, shell=True) != 0:
-            sys.exit(1)
-        # set quota mount options
-        if volname == 'global' or volname == 'default-school':
-            mntopts = quotamntopts
-        else:
-            mntopts = 'defaults'
-        fstab = fstab + volpath + ' ' + volmnt + ' ext4 ' + mntopts + ' 0 1\n'
+    try:
+        for item in lvmvols:
+            volname = item[0]
+            volsize = item[1]
+            if '%' in volsize:
+                volsize = ' -l ' + volsize
+            else:
+                volsize = ' -L ' + volsize
+            volmnt = item[2]
+            subprocess.call('mkdir -p ' + volmnt, shell=True)
+            volpath = '/dev/' + vgname + '/' + volname
+            print('# Creating logical volume ' + volname + '.')
+            lvcreate = 'lvcreate' + volsize + ' -n ' + volname + ' ' + vgname
+            print('# ' + lvcreate)
+            if subprocess.call(lvcreate, shell=True) != 0:
+                sys.exit(1)
+            if subprocess.call('mkfs.ext4 -L ' + volname + ' ' + volpath, shell=True) != 0:
+                sys.exit(1)
+            volnames += volname
+            # set quota mount options
+            if volname == 'global' or volname == 'default-school':
+                mntopts = quotamntopts
+            else:
+                mntopts = 'defaults'
+            fstab = fstab + volpath + ' ' + volmnt + ' ext4 ' + mntopts + ' 0 1\n'
+    except:
+        pass
+    finally:
+        print(ERROR-DESCRIPTION)
+        #Removing the faulty LVM (volume-group, logical volumes)
+        print('subprocess.call(lvremove -y ' + volnames + ' , shell=True)') 
+        print('subprocess.call(vgremove -y ' + volname + ' , shell=True)') 
+        sys.exit(1)
     print('# Writing /etc/fstab.')
     if not writeTextfile('/etc/fstab', fstab, 'w'):
         sys.exit(1)
